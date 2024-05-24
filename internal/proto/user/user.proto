@@ -6,7 +6,7 @@ option go_package = "github.com/msmkdenis/yap-gophkeeper/internal/proto/user";
 
 message PostUserRegisterRequest {
   string login = 1;
-  bytes password = 2;
+  string password = 2;
 }
 
 message PostUserRegisterResponse {
@@ -15,7 +15,7 @@ message PostUserRegisterResponse {
 
 message PostUserLoginRequest {
   string login = 1;
-  bytes password = 2;
+  string password = 2;
 }
 
 message PostUserLoginResponse {

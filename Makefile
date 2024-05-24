@@ -9,7 +9,7 @@ proto-user:
        		internal/proto/user/user.proto
 
 server-keys:
-	cd cert/server/; sh gen.sh;
+	cd internal/tlsconfig/cert/server/; sh gen.sh;
 
 client-keys:
-	cd cert/client/; sh gen.sh;
+	cd internal/tlsconfig/cert/client/; sh gen.sh;

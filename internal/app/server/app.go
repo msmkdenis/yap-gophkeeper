@@ -8,6 +8,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/msmkdenis/yap-gophkeeper/internal/encryption"
+
 	"github.com/go-playground/validator/v10"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -34,6 +36,12 @@ func Run() {
 		os.Exit(1)
 	}
 
+	cryptService, err := encryption.New([]byte("master-key"))
+	if err != nil {
+		slog.Error("Failed to initialize crypt service", slog.String("error", err.Error()))
+		os.Exit(1)
+	}
+
 	postgresPool, err := initPostgresPool(cfg.DatabaseURI)
 	if err != nil {
 		slog.Error("Failed to initialize postgres pool", slog.String("error", err.Error()))
@@ -44,7 +52,7 @@ func Run() {
 
 	userRepository := repository.NewUserRepository(postgresPool)
 
-	userService := service.New(userRepository, jwtManager)
+	userService := service.New(userRepository, cryptService, jwtManager)
 
 	tls, err := tlsconfig.NewTLS(cfg.ServerCert, cfg.ServerKey, cfg.ServerCa)
 	if err != nil {

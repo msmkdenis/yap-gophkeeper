@@ -1,0 +1,15 @@
+services:
+  redis:
+    image: redis:latest
+    container_name: gophkeeper-redis
+    ports:
+      - "6379:6379"
+    environment:
+      - REDIS_PASSWORD=
+      - REDIS_PORT=6379
+      - REDIS_DATABASES=0
+    volumes:
+      - redis_data:/data
+
+volumes:
+  redis_data:

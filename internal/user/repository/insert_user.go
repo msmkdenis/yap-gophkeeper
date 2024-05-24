@@ -13,17 +13,18 @@ func (r *PostgresUserRepository) Insert(ctx context.Context, user model.User) (m
 	rows, err := r.postgresPool.DB.Query(ctx,
 		`
 			insert into gophkeeper.user
-				(id, login, password, created_at, updated_at)
+				(id, login, password, crypt_key, created_at, updated_at)
 			values
-				($1, $2, $3, NOW(), NOW())
+				($1, $2, $3, $4, NOW(), NOW())
 			on conflict (login) do update set
 				password = excluded.password,
 				updated_at = now()
-			returning id, login, password, created_at, updated_at;
+			returning id, login, password, crypt_key, created_at, updated_at;
 			`,
 		user.ID,
 		user.Login,
-		user.Password)
+		user.Password,
+		user.CryptKey)
 	if err != nil {
 		return model.User{}, fmt.Errorf("insert user: %w", err)
 	}
