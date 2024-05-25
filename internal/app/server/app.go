@@ -8,14 +8,14 @@ import (
 	"os"
 	"time"
 
-	"github.com/msmkdenis/yap-gophkeeper/internal/encryption"
-
 	"github.com/go-playground/validator/v10"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/reflection"
 
+	"github.com/msmkdenis/yap-gophkeeper/internal/cache"
 	"github.com/msmkdenis/yap-gophkeeper/internal/config"
+	"github.com/msmkdenis/yap-gophkeeper/internal/encryption"
 	"github.com/msmkdenis/yap-gophkeeper/internal/proto/user"
 	"github.com/msmkdenis/yap-gophkeeper/internal/storage/postgresql"
 	"github.com/msmkdenis/yap-gophkeeper/internal/tlsconfig"
@@ -36,6 +36,12 @@ func Run() {
 		os.Exit(1)
 	}
 
+	redis, err := cache.NewRedis(cfg.RedisURL, cfg.RedisPassword, cfg.RedisDB, cfg.RedisTimeoutSec)
+	if err != nil {
+		slog.Error("Failed to initialize redis", slog.String("error", err.Error()))
+		os.Exit(1)
+	}
+
 	cryptService, err := encryption.New([]byte("master-key"))
 	if err != nil {
 		slog.Error("Failed to initialize crypt service", slog.String("error", err.Error()))
@@ -52,7 +58,7 @@ func Run() {
 
 	userRepository := repository.NewUserRepository(postgresPool)
 
-	userService := service.New(userRepository, cryptService, jwtManager)
+	userService := service.New(userRepository, cryptService, jwtManager, redis)
 
 	tls, err := tlsconfig.NewTLS(cfg.ServerCert, cfg.ServerKey, cfg.ServerCa)
 	if err != nil {

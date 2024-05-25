@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 
+	"github.com/msmkdenis/yap-gophkeeper/internal/cache"
 	"github.com/msmkdenis/yap-gophkeeper/internal/model"
 	"github.com/msmkdenis/yap-gophkeeper/pkg/jwtmanager"
 )
@@ -22,12 +23,14 @@ type UserService struct {
 	repository UserRepository
 	crypt      CryptService
 	jwtManager *jwtmanager.JWTManager
+	redis      *cache.Redis
 }
 
-func New(repository UserRepository, crypt CryptService, jwtManager *jwtmanager.JWTManager) *UserService {
+func New(repository UserRepository, crypt CryptService, jwtManager *jwtmanager.JWTManager, redis *cache.Redis) *UserService {
 	return &UserService{
 		repository: repository,
 		crypt:      crypt,
 		jwtManager: jwtManager,
+		redis:      redis,
 	}
 }

@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -13,22 +14,22 @@ import (
 func (u *UserService) Register(ctx context.Context, req model.UserRegisterRequest) (string, error) {
 	id, err := uuid.NewUUID()
 	if err != nil {
-		return "", fmt.Errorf("register create uuid: %w", err)
+		return "", fmt.Errorf("new uuid: %w", err)
 	}
 
 	userKey, err := u.crypt.GenerateKey()
 	if err != nil {
-		return "", fmt.Errorf("register generate key: %w", err)
+		return "", fmt.Errorf("genereate key: %w", err)
 	}
 
 	cryptUserKey, err := u.crypt.EncryptWithMasterKey(userKey)
 	if err != nil {
-		return "", fmt.Errorf("register crypt key: %w", err)
+		return "", fmt.Errorf("encrypt with master key: %w", err)
 	}
 
 	passwordHash, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
-		return "", fmt.Errorf("register hash: %w", err)
+		return "", fmt.Errorf("generate hash from password: %w", err)
 	}
 
 	userToSave := model.User{
@@ -40,12 +41,17 @@ func (u *UserService) Register(ctx context.Context, req model.UserRegisterReques
 
 	user, err := u.repository.Insert(ctx, userToSave)
 	if err != nil {
-		return "", fmt.Errorf("register insert user: %w", err)
+		return "", fmt.Errorf("register user: %w", err)
+	}
+
+	st := u.redis.Client.Set(ctx, user.ID, user.CryptKey, 24*time.Hour)
+	if st.Err() != nil {
+		return "", fmt.Errorf("redis set: %w", st.Err())
 	}
 
 	token, err := u.jwtManager.BuildJWTString(user.ID)
 	if err != nil {
-		return "", fmt.Errorf("register build jwt: %w", err)
+		return "", fmt.Errorf("build jwt: %w", err)
 	}
 
 	return token, nil

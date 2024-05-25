@@ -40,7 +40,7 @@ func (j *JWTManager) BuildJWTString(userID string) (string, error) {
 
 	tokenString, err := token.SignedString([]byte(j.secretKey))
 	if err != nil {
-		return "", fmt.Errorf("buildJWTString signstring %w", err)
+		return "", fmt.Errorf("sign token %w", err)
 	}
 
 	return tokenString, nil

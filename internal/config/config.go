@@ -9,14 +9,18 @@ import (
 )
 
 type Config struct {
-	DatabaseURI   string
-	GRPCServer    string
-	TokenName     string
-	TokenSecret   string
-	TokenExpHours int
-	ServerCert    string
-	ServerKey     string
-	ServerCa      string
+	DatabaseURI     string
+	GRPCServer      string
+	TokenName       string
+	TokenSecret     string
+	TokenExpHours   int
+	ServerCert      string
+	ServerKey       string
+	ServerCa        string
+	RedisURL        string
+	RedisPassword   string
+	RedisDB         int
+	RedisTimeoutSec int
 }
 
 func New() (*Config, error) {
@@ -31,13 +35,26 @@ func New() (*Config, error) {
 	config.TokenName = os.Getenv("TOKEN_NAME")
 	expHours, err := strconv.Atoi(os.Getenv("TOKEN_EXP_HOURS"))
 	if err != nil {
-		return nil, fmt.Errorf("new Atoi TOKEN_EXP_HOURS: %w", err)
+		return nil, fmt.Errorf("atoi TOKEN_EXP_HOURS: %w", err)
 	}
 	config.TokenExpHours = expHours
 	config.TokenSecret = os.Getenv("TOKEN_SECRET")
 	config.ServerCert = os.Getenv("SERVER_CERT_FILE")
 	config.ServerKey = os.Getenv("SERVER_KEY_FILE")
 	config.ServerCa = os.Getenv("SERVER_CA_FILE")
+
+	config.RedisURL = os.Getenv("REDIS_URL")
+	config.RedisPassword = os.Getenv("REDIS_PASSWORD")
+	db, err := strconv.Atoi(os.Getenv("REDIS_DB"))
+	if err != nil {
+		return nil, fmt.Errorf("atoi REDIS_DB: %w", err)
+	}
+	config.RedisDB = db
+
+	config.RedisTimeoutSec, err = strconv.Atoi(os.Getenv("REDIS_TIMEOUT_SEC"))
+	if err != nil {
+		return nil, fmt.Errorf("atoi REDIS_TIMEOUT_SEC: %w", err)
+	}
 
 	return config, nil
 }
