@@ -44,7 +44,7 @@ func (u *UserService) Register(ctx context.Context, req model.UserRegisterReques
 		return "", fmt.Errorf("register user: %w", err)
 	}
 
-	st := u.redis.Client.Set(ctx, user.ID, user.CryptKey, 24*time.Hour)
+	st := u.redis.Client.Set(ctx, user.ID, userKey, 24*time.Hour)
 	if st.Err() != nil {
 		return "", fmt.Errorf("redis set: %w", st.Err())
 	}

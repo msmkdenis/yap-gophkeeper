@@ -6,6 +6,6 @@ type PostgresUserRepository struct {
 	postgresPool *postgresql.PostgresPool
 }
 
-func NewUserRepository(postgresPool *postgresql.PostgresPool) *PostgresUserRepository {
+func New(postgresPool *postgresql.PostgresPool) *PostgresUserRepository {
 	return &PostgresUserRepository{postgresPool: postgresPool}
 }

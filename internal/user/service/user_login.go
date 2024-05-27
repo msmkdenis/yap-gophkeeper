@@ -26,7 +26,12 @@ func (u *UserService) Login(ctx context.Context, req model.UserLoginRequest) (st
 		return "", fmt.Errorf("login build jwt: %w", err)
 	}
 
-	st := u.redis.Client.Set(ctx, user.ID, user.CryptKey, 24*time.Hour)
+	userKey, err := u.crypt.DecryptWithMasterKey(user.CryptKey)
+	if err != nil {
+		return "", fmt.Errorf("decryptWithMasterKey: %w", err)
+	}
+
+	st := u.redis.Client.Set(ctx, user.ID, userKey, 24*time.Hour)
 	if st.Err() != nil {
 		return "", fmt.Errorf("login redis set: %w", st.Err())
 	}

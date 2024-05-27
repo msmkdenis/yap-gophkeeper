@@ -9,29 +9,28 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/msmkdenis/yap-gophkeeper/internal/model"
-	pb "github.com/msmkdenis/yap-gophkeeper/internal/proto/user"
+	pb "github.com/msmkdenis/yap-gophkeeper/internal/proto/credit_card"
 )
 
-type UserService interface {
-	Register(ctx context.Context, user model.UserRegisterRequest) (string, error)
-	Login(ctx context.Context, user model.UserLoginRequest) (string, error)
+type CreditCardService interface {
+	SaveCreditCard(ctx context.Context, req model.CreditCardPostRequest) (model.CreditCardPostResponse, error)
+	LoadAllCreditCard(ctx context.Context) ([]model.CreditCardPostResponse, error)
 }
 
 type Validator interface {
-	ValidateLoginRequest(req *model.UserLoginRequest) (map[string]string, bool)
-	ValidateRegisterRequest(req *model.UserRegisterRequest) (map[string]string, bool)
+	ValidatePostRequest(req *model.CreditCardPostRequest) (map[string]string, bool)
 }
 
-type UserHandler struct {
-	userService UserService
-	pb.UnimplementedUserServiceServer
+type CreditCardHandler struct {
+	creditCardService CreditCardService
+	pb.UnimplementedCreditCardServiceServer
 	validator Validator
 }
 
-func New(userService UserService, validator Validator) *UserHandler {
-	return &UserHandler{
-		userService: userService,
-		validator:   validator,
+func New(creditCardService CreditCardService, validator Validator) *CreditCardHandler {
+	return &CreditCardHandler{
+		creditCardService: creditCardService,
+		validator:         validator,
 	}
 }
 

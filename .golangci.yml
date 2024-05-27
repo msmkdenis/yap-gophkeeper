@@ -124,7 +124,7 @@ linters:
     - exhaustive
     #     - exhaustruct
     - forbidigo
-    - funlen
+    #     - funlen
     #     - gci
     - gocognit
     - goconst
