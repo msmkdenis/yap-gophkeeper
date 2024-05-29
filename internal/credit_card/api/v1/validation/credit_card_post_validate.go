@@ -26,6 +26,8 @@ func (v *Validator) ValidatePostRequest(req *model.CreditCardPostRequest) (map[s
 					report[validationErr.Field()] = "must be valid pin"
 				case "required":
 					report[validationErr.Field()] = "is required"
+				case "expires_at":
+					report[validationErr.Field()] = "expires_at must be in DD-MM-YYYY format"
 				}
 			}
 			return report, false

@@ -13,3 +13,8 @@ server-keys:
 
 client-keys:
 	cd internal/tlsconfig/cert/client/; sh gen.sh;
+
+mock-credit-card-service:
+	@mockgen --build_flags=--mod=mod \
+			 -destination=internal/mocks/credit_card/mock_credit_card_service.go \
+			 -package=mocks github.com/msmkdenis/yap-gophkeeper/internal/credit_card/api/v1/grpchandlers CreditCardService

@@ -3,10 +3,13 @@ package validation
 import (
 	"fmt"
 	"strings"
+	"time"
 	"unicode"
 
 	"github.com/go-playground/validator/v10"
 )
+
+const expiresAtLayout = "02-01-2006"
 
 type Validator struct {
 	validator *validator.Validate
@@ -35,7 +38,17 @@ func New(validator *validator.Validate) (*Validator, error) {
 		return nil, fmt.Errorf("register card_number: %w", err)
 	}
 
+	err = v.validator.RegisterValidation("expires_at", expiresAt)
+	if err != nil {
+		return nil, fmt.Errorf("register expires_at: %w", err)
+	}
+
 	return v, nil
+}
+
+func expiresAt(fl validator.FieldLevel) bool {
+	_, err := time.Parse(expiresAtLayout, fl.Field().String())
+	return err == nil
 }
 
 func cardNumber(fl validator.FieldLevel) bool {

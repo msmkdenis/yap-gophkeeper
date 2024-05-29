@@ -8,13 +8,14 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/msmkdenis/yap-gophkeeper/internal/credit_card/specification"
 	"github.com/msmkdenis/yap-gophkeeper/internal/model"
 	pb "github.com/msmkdenis/yap-gophkeeper/internal/proto/credit_card"
 )
 
 type CreditCardService interface {
 	SaveCreditCard(ctx context.Context, req model.CreditCardPostRequest) (model.CreditCardPostResponse, error)
-	LoadAllCreditCard(ctx context.Context) ([]model.CreditCardPostResponse, error)
+	LoadAllCreditCard(ctx context.Context, spec specification.CreditCardSpecification) ([]model.CreditCardPostResponse, error)
 }
 
 type Validator interface {

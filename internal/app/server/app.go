@@ -93,7 +93,7 @@ func Run() {
 
 	reflection.Register(grpcServer)
 
-	listener, err := net.Listen("tcp", "localhost:3300")
+	listener, err := net.Listen("tcp", cfg.GRPCServer)
 	if err != nil {
 		slog.Error("Unable to create listener", slog.String("error", err.Error()))
 		os.Exit(1)

@@ -5,6 +5,8 @@ import (
 	"log/slog"
 	"time"
 
+	"github.com/msmkdenis/yap-gophkeeper/internal/credit_card/specification"
+
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -12,7 +14,13 @@ import (
 )
 
 func (h *CreditCardHandler) GetLoadCreditCard(ctx context.Context, in *pb.GetCreditCardRequest) (*pb.GetCreditCardResponse, error) {
-	cards, err := h.creditCardService.LoadAllCreditCard(ctx)
+	spec, err := specification.NewCreditCardSpecification(in)
+	if err != nil {
+		slog.Error("Error while creating credit card specification: ", slog.String("error", err.Error()))
+		return nil, status.Error(codes.Internal, "internal error")
+	}
+
+	cards, err := h.creditCardService.LoadAllCreditCard(ctx, spec)
 	if err != nil {
 		slog.Error("Error while loading credit cards: ", slog.String("error", err.Error()))
 		return nil, status.Error(codes.Internal, "internal error")

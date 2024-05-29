@@ -26,7 +26,15 @@ message PostCreditCardResponse {
   string updated_at = 10;
 }
 
-message GetCreditCardRequest {}
+message GetCreditCardRequest {
+  string number = 1;
+  string owner = 2;
+  string cvv_code = 3;
+  string pin_code = 4;
+  string metadata = 5;
+  string expires_after = 6;
+  string expires_before = 7;
+}
 
 message CreditCard {
   string id = 1;

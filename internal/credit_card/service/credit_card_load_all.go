@@ -4,12 +4,13 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/msmkdenis/yap-gophkeeper/internal/credit_card/specification"
 	"github.com/msmkdenis/yap-gophkeeper/internal/interceptors/auth"
 	"github.com/msmkdenis/yap-gophkeeper/internal/interceptors/keyextraction"
 	"github.com/msmkdenis/yap-gophkeeper/internal/model"
 )
 
-func (s *CreditCardService) LoadAllCreditCard(ctx context.Context) ([]model.CreditCardPostResponse, error) {
+func (s *CreditCardService) LoadAllCreditCard(ctx context.Context, spec specification.CreditCardSpecification) ([]model.CreditCardPostResponse, error) {
 	userID, ok := ctx.Value(auth.UserIDContextKey("userID")).(string)
 	if !ok {
 		return nil, fmt.Errorf("failed to get userID from context")
@@ -66,5 +67,20 @@ func (s *CreditCardService) LoadAllCreditCard(ctx context.Context) ([]model.Cred
 		})
 	}
 
-	return cards, nil
+	predicates := spec.MakeFilterPredicates()
+	var filteredCards []model.CreditCardPostResponse
+	for _, card := range cards {
+		take := true
+		for _, filterCardWithSpec := range predicates {
+			if !filterCardWithSpec(spec, card) {
+				take = false
+				break
+			}
+		}
+		if take {
+			filteredCards = append(filteredCards, card)
+		}
+	}
+
+	return filteredCards, nil
 }

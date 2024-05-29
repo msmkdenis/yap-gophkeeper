@@ -1,4 +1,30 @@
 services:
+  gophkeeper:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: gophkeeper-app
+    container_name: gophkeeper-app
+    restart: always
+    environment:
+      - DATABASE_URI=postgres://postgres:postgres@gophkeeper-postgres:5432/yap-gophkeeper?sslmode=disable
+      - GRPC_SERVER=:3300
+      - REDIS_URL=redis:6379
+      - REDIS_PASSWORD=
+      - REDIS_DB=0
+      - REDIS_TIMEOUT_SEC=2
+      - TOKEN_NAME=token
+      - TOKEN_EXP_HOURS=24
+      - TOKEN_SECRET=secret
+      - SERVER_CERT_FILE=/internal/tlsconfig/cert/server/server.crt
+      - SERVER_KEY_FILE=/internal/tlsconfig/cert/server/server.key
+      - SERVER_CA_FILE=/internal/tlsconfig/cert/server/ca.crt
+    ports:
+      - "3300:3300"
+    depends_on:
+      - redis
+      - postgres_db
+
   redis:
     image: redis:latest
     container_name: gophkeeper-redis
@@ -11,5 +37,26 @@ services:
     volumes:
       - redis_data:/data
 
+  # PostgreSQL
+  postgres_db:
+    image: postgres:15.3
+    container_name: gophkeeper-postgres
+    restart: always
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_PASSWORD}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=yap-gophkeeper
+    ports:
+      - "5436:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
 volumes:
+  pg_data:
   redis_data:

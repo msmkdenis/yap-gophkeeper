@@ -5,7 +5,7 @@ import "time"
 type CreditCardPostRequest struct {
 	Number    string `validate:"required,card_number"`
 	OwnerName string `validate:"required,owner"`
-	ExpiresAt string
+	ExpiresAt string `validate:"expires_at"`
 	CVV       string `validate:"cvv"`
 	PinCode   string `validate:"pin"`
 	MetaData  string
