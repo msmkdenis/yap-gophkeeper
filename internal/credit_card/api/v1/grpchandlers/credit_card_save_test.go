@@ -110,6 +110,44 @@ func (c *CreditCardHandlerTestSuite) Test_PostSaveCreditCard() {
 			},
 		},
 		{
+			name:  "BadRequest - invalid PIN",
+			token: token,
+			body: &pb.PostCreditCardRequest{
+				Number:    "4368 0811 1360 1890",
+				OwnerName: "user name",
+				ExpiresAt: "20-06-2024",
+				CvvCode:   "111",
+				PinCode:   "22",
+				Metadata:  "some user metadata",
+			},
+			expectedCode:                 codes.InvalidArgument,
+			expectedStatusMessage:        "invalid credit_card post request",
+			expectedViolationField:       "PinCode",
+			expectedViolationDescription: "must be valid pin",
+			prepare: func() {
+				c.creditCardService.EXPECT().SaveCreditCard(gomock.Any(), gomock.Any()).Times(0)
+			},
+		},
+		{
+			name:  "BadRequest - name is required",
+			token: token,
+			body: &pb.PostCreditCardRequest{
+				Number:    "",
+				OwnerName: "user name",
+				ExpiresAt: "20-06-2024",
+				CvvCode:   "111",
+				PinCode:   "2222",
+				Metadata:  "some user metadata",
+			},
+			expectedCode:                 codes.InvalidArgument,
+			expectedStatusMessage:        "invalid credit_card post request",
+			expectedViolationField:       "Number",
+			expectedViolationDescription: "is required",
+			prepare: func() {
+				c.creditCardService.EXPECT().SaveCreditCard(gomock.Any(), gomock.Any()).Times(0)
+			},
+		},
+		{
 			name:  "Unauthorized - token not found",
 			token: "",
 			body: &pb.PostCreditCardRequest{
