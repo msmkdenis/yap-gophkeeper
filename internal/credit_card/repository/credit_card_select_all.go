@@ -13,7 +13,7 @@ func (r *PostgresCreditCardRepository) SelectAll(ctx context.Context, userID str
 	rows, err := r.postgresPool.DB.Query(ctx,
 		`
 			select
-			    id, owner_id, number, owner_name, expires_at, cvv_code, pin_code, created_at, updated_at, metadata 
+			    id, owner_id, data, created_at, updated_at, metadata 
 			from gophkeeper.credit_card
 			where owner_id = $1;
 			`,

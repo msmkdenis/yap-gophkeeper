@@ -17,18 +17,14 @@ func (r *PostgresCreditCardRepository) Insert(ctx context.Context, card model.Cr
 	rows, err := r.postgresPool.DB.Query(ctx,
 		`
 			insert into gophkeeper.credit_card
-			    (id, owner_id, number, owner_name, expires_at, cvv_code, pin_code, created_at, updated_at, metadata) 
+			    (id, owner_id, data, created_at, updated_at, metadata) 
 			values
-				($1, $2, $3, $4, $5, $6, $7, now(), now(), $8)
-			returning id, owner_id, number, owner_name, expires_at, cvv_code, pin_code, created_at, updated_at, metadata;
+				($1, $2, $3, now(), now(), $4)
+			returning id, owner_id, data, created_at, updated_at, metadata;
 			`,
 		card.ID,
 		card.OwnerID,
-		card.Number,
-		card.OwnerName,
-		card.ExpiresAt,
-		card.CVV,
-		card.PinCode,
+		card.CryptData,
 		card.MetaData)
 	if err != nil {
 		return model.CreditCard{}, fmt.Errorf("make query: %w", err)

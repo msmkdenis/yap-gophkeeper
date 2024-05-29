@@ -24,14 +24,18 @@ type CreditCardPostResponse struct {
 	UpdatedAt time.Time
 }
 
+type CreditCardCryptData struct {
+	Number    string
+	OwnerName string
+	ExpiresAt string
+	CVV       string
+	PinCode   string
+}
+
 type CreditCard struct {
 	ID        string    `db:"id" redis:"id"`
 	OwnerID   string    `db:"owner_id" redis:"owner_id"`
-	Number    []byte    `db:"number" redis:"number"`
-	OwnerName []byte    `db:"owner_name" redis:"owner_name"`
-	ExpiresAt []byte    `db:"expires_at" redis:"expires_at"`
-	CVV       []byte    `db:"cvv_code" redis:"cvv_code"`
-	PinCode   []byte    `db:"pin_code" redis:"pin_code"`
+	CryptData []byte    `db:"data" redis:"number"`
 	CreatedAt time.Time `db:"created_at" redis:"created_at"`
 	UpdatedAt time.Time `db:"updated_at" redis:"updated_at"`
 	MetaData  string    `db:"meta_data" redis:"meta_data"`

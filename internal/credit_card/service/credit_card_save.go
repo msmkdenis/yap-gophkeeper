@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"github.com/google/uuid"
@@ -27,39 +28,28 @@ func (s *CreditCardService) SaveCreditCard(ctx context.Context, req model.Credit
 		return model.CreditCardPostResponse{}, fmt.Errorf("new uuid: %w", err)
 	}
 
-	cryptNumber, err := s.crypt.Encrypt(userKey, []byte(req.Number))
-	if err != nil {
-		return model.CreditCardPostResponse{}, fmt.Errorf("encrypt number: %w", err)
+	card := model.CreditCardCryptData{
+		Number:    req.Number,
+		OwnerName: req.OwnerName,
+		ExpiresAt: req.ExpiresAt,
+		CVV:       req.CVV,
+		PinCode:   req.PinCode,
 	}
 
-	cryptOwnerName, err := s.crypt.Encrypt(userKey, []byte(req.OwnerName))
+	data, err := json.Marshal(card)
 	if err != nil {
-		return model.CreditCardPostResponse{}, fmt.Errorf("encrypt owner_name: %w", err)
+		return model.CreditCardPostResponse{}, fmt.Errorf("marshal: %w", err)
 	}
 
-	cryptExpiresAt, err := s.crypt.Encrypt(userKey, []byte(req.ExpiresAt))
+	cryptData, err := s.crypt.Encrypt(userKey, data)
 	if err != nil {
-		return model.CreditCardPostResponse{}, fmt.Errorf("encrypt expires_at: %w", err)
-	}
-
-	cryptCVV, err := s.crypt.Encrypt(userKey, []byte(req.CVV))
-	if err != nil {
-		return model.CreditCardPostResponse{}, fmt.Errorf("encrypt cvv: %w", err)
-	}
-
-	cryptPIN, err := s.crypt.Encrypt(userKey, []byte(req.PinCode))
-	if err != nil {
-		return model.CreditCardPostResponse{}, fmt.Errorf("encrypt pin: %w", err)
+		return model.CreditCardPostResponse{}, fmt.Errorf("encrypt data: %w", err)
 	}
 
 	creditCard := model.CreditCard{
 		ID:        id.String(),
 		OwnerID:   userID,
-		Number:    cryptNumber,
-		OwnerName: cryptOwnerName,
-		ExpiresAt: cryptExpiresAt,
-		CVV:       cryptCVV,
-		PinCode:   cryptPIN,
+		CryptData: cryptData,
 		MetaData:  req.MetaData,
 	}
 

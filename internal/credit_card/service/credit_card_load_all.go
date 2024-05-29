@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"github.com/msmkdenis/yap-gophkeeper/internal/credit_card/specification"
@@ -28,39 +29,25 @@ func (s *CreditCardService) LoadAllCreditCard(ctx context.Context, spec specific
 
 	cards := make([]model.CreditCardPostResponse, 0, len(encryptedCards))
 	for _, encryptedCard := range encryptedCards {
-		decryptedNumber, err := s.crypt.Decrypt(userKey, encryptedCard.Number)
+		decryptedData, err := s.crypt.Decrypt(userKey, encryptedCard.CryptData)
 		if err != nil {
-			return nil, fmt.Errorf("decrypt card: %w", err)
+			return nil, fmt.Errorf("decrypt data: %w", err)
 		}
 
-		decryptedOwnerName, err := s.crypt.Decrypt(userKey, encryptedCard.OwnerName)
+		var card model.CreditCardCryptData
+		err = json.Unmarshal(decryptedData, &card)
 		if err != nil {
-			return nil, fmt.Errorf("decrypt owner: %w", err)
-		}
-
-		decryptedExpiresAt, err := s.crypt.Decrypt(userKey, encryptedCard.ExpiresAt)
-		if err != nil {
-			return nil, fmt.Errorf("decrypt expiry: %w", err)
-		}
-
-		decryptedCVV, err := s.crypt.Decrypt(userKey, encryptedCard.CVV)
-		if err != nil {
-			return nil, fmt.Errorf("decrypt cvv: %w", err)
-		}
-
-		decryptedPIN, err := s.crypt.Decrypt(userKey, encryptedCard.PinCode)
-		if err != nil {
-			return nil, fmt.Errorf("decrypt pin: %w", err)
+			return nil, fmt.Errorf("unmarshal data: %w", err)
 		}
 
 		cards = append(cards, model.CreditCardPostResponse{
 			ID:        encryptedCard.ID,
 			OwnerID:   encryptedCard.OwnerID,
-			Number:    string(decryptedNumber),
-			OwnerName: string(decryptedOwnerName),
-			ExpiresAt: string(decryptedExpiresAt),
-			CVV:       string(decryptedCVV),
-			PinCode:   string(decryptedPIN),
+			Number:    card.Number,
+			OwnerName: card.OwnerName,
+			ExpiresAt: card.ExpiresAt,
+			CVV:       card.CVV,
+			PinCode:   card.PinCode,
 			MetaData:  encryptedCard.MetaData,
 			CreatedAt: encryptedCard.CreatedAt,
 			UpdatedAt: encryptedCard.UpdatedAt,
