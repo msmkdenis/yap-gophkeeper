@@ -50,7 +50,7 @@ func NewCreditCardSpecification(in *pb.GetCreditCardRequest) (CreditCardSpecific
 	return spec, nil
 }
 
-type Predicate func(spec CreditCardSpecification, resp model.CreditCardPostResponse) bool
+type Predicate func(spec CreditCardSpecification, resp model.CreditCard) bool
 
 func (t *CreditCardSpecification) MakeFilterPredicates() []Predicate {
 	var predicates []Predicate
@@ -79,7 +79,7 @@ func (t *CreditCardSpecification) MakeFilterPredicates() []Predicate {
 }
 
 func makeExpiresAfterPredicate() Predicate {
-	return func(spec CreditCardSpecification, resp model.CreditCardPostResponse) bool {
+	return func(spec CreditCardSpecification, resp model.CreditCard) bool {
 		expiresAt, err := time.Parse(expiresAtLayout, resp.ExpiresAt)
 		if err != nil {
 			return false
@@ -90,7 +90,7 @@ func makeExpiresAfterPredicate() Predicate {
 }
 
 func makeExpiresBeforePredicate() Predicate {
-	return func(spec CreditCardSpecification, resp model.CreditCardPostResponse) bool {
+	return func(spec CreditCardSpecification, resp model.CreditCard) bool {
 		expiresAt, err := time.Parse(expiresAtLayout, resp.ExpiresAt)
 		if err != nil {
 			return false
@@ -101,31 +101,31 @@ func makeExpiresBeforePredicate() Predicate {
 }
 
 func makeNumberPredicate() Predicate {
-	return func(spec CreditCardSpecification, resp model.CreditCardPostResponse) bool {
+	return func(spec CreditCardSpecification, resp model.CreditCard) bool {
 		return strings.Contains(strings.ToLower(resp.Number), strings.ToLower(spec.Number))
 	}
 }
 
 func makeOwnerNamePredicate() Predicate {
-	return func(spec CreditCardSpecification, resp model.CreditCardPostResponse) bool {
+	return func(spec CreditCardSpecification, resp model.CreditCard) bool {
 		return strings.Contains(strings.ToLower(resp.OwnerName), strings.ToLower(spec.OwnerName))
 	}
 }
 
 func makeCVVPredicate() Predicate {
-	return func(spec CreditCardSpecification, resp model.CreditCardPostResponse) bool {
+	return func(spec CreditCardSpecification, resp model.CreditCard) bool {
 		return strings.Contains(strings.ToLower(resp.CVV), strings.ToLower(spec.CVV))
 	}
 }
 
 func makePINPredicate() Predicate {
-	return func(spec CreditCardSpecification, resp model.CreditCardPostResponse) bool {
+	return func(spec CreditCardSpecification, resp model.CreditCard) bool {
 		return strings.Contains(strings.ToLower(resp.PinCode), strings.ToLower(spec.PinCode))
 	}
 }
 
 func makeMetaDataPredicate() Predicate {
-	return func(spec CreditCardSpecification, resp model.CreditCardPostResponse) bool {
+	return func(spec CreditCardSpecification, resp model.CreditCard) bool {
 		return strings.Contains(strings.ToLower(resp.MetaData), strings.ToLower(spec.MetaData))
 	}
 }

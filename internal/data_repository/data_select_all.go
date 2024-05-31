@@ -9,20 +9,20 @@ import (
 	"github.com/msmkdenis/yap-gophkeeper/internal/model"
 )
 
-func (r *PostgresCreditCardRepository) SelectAll(ctx context.Context, userID string) ([]model.CreditCard, error) {
+func (r *PostgresDataRepository) SelectAll(ctx context.Context, userID, dataType string) ([]model.Data, error) {
 	rows, err := r.postgresPool.DB.Query(ctx,
 		`
 			select
-			    id, owner_id, data, created_at, updated_at, metadata 
-			from gophkeeper.credit_card
-			where owner_id = $1;
+			    id, owner_id, type, data, metadata, created_at, updated_at 
+			from gophkeeper.data
+			where owner_id = $1 and type = $2;
 			`,
-		userID)
+		userID, dataType)
 	if err != nil {
 		return nil, fmt.Errorf("make query: %w", err)
 	}
 
-	cards, err := pgx.CollectRows(rows, pgx.RowToStructByPos[model.CreditCard])
+	cards, err := pgx.CollectRows(rows, pgx.RowToStructByPos[model.Data])
 	if err != nil {
 		return nil, fmt.Errorf("collect row: %w", err)
 	}

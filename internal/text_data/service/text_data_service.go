@@ -8,7 +8,7 @@ import (
 	"github.com/msmkdenis/yap-gophkeeper/pkg/jwtmanager"
 )
 
-const creditCard = "credit_card"
+const textData = "text_data"
 
 type DataRepository interface {
 	Insert(ctx context.Context, data model.Data) (model.Data, error)
@@ -23,7 +23,7 @@ type CryptService interface {
 	GenerateKey() ([]byte, error)
 }
 
-type CreditCardService struct {
+type TextDataService struct {
 	repository DataRepository
 	crypt      CryptService
 	jwtManager *jwtmanager.JWTManager
@@ -31,12 +31,12 @@ type CreditCardService struct {
 	dataType   string
 }
 
-func New(repository DataRepository, crypt CryptService, jwtManager *jwtmanager.JWTManager, redis *cache.Redis) *CreditCardService {
-	return &CreditCardService{
+func New(repository DataRepository, crypt CryptService, jwtManager *jwtmanager.JWTManager, redis *cache.Redis) *TextDataService {
+	return &TextDataService{
 		repository: repository,
 		crypt:      crypt,
 		jwtManager: jwtManager,
 		redis:      redis,
-		dataType:   creditCard,
+		dataType:   textData,
 	}
 }

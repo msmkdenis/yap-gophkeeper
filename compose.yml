@@ -39,11 +39,11 @@ services:
 
   # PostgreSQL
   postgres_db:
-    image: postgres:15.3
+    image: postgres:16
     container_name: gophkeeper-postgres
     restart: always
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_PASSWORD}" ]
+      test: [ "CMD-SHELL", "pg_isready -U ${postgres} -d ${postgres}" ]
       interval: 10s
       timeout: 5s
       retries: 5

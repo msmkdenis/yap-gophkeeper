@@ -24,7 +24,7 @@ func (c *CreditCardHandlerTestSuite) Test_GetLoadCreditCard() {
 	token, err := c.jwtManager.BuildJWTString("050a289a-d10a-417b-ab89-3acfca0f6529")
 	require.NoError(c.T(), err)
 
-	cards := []model.CreditCardPostResponse{
+	cards := []model.CreditCard{
 		{
 			ID:        "some id",
 			OwnerID:   "some owner id",

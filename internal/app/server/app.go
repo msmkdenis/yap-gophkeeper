@@ -17,14 +17,18 @@ import (
 	"github.com/msmkdenis/yap-gophkeeper/internal/config"
 	creditCardGRPCHandlers "github.com/msmkdenis/yap-gophkeeper/internal/credit_card/api/v1/grpchandlers"
 	creditCardValidation "github.com/msmkdenis/yap-gophkeeper/internal/credit_card/api/v1/validation"
-	creditCardRepository "github.com/msmkdenis/yap-gophkeeper/internal/credit_card/repository"
 	creditCardService "github.com/msmkdenis/yap-gophkeeper/internal/credit_card/service"
+	repository "github.com/msmkdenis/yap-gophkeeper/internal/data_repository"
 	"github.com/msmkdenis/yap-gophkeeper/internal/encryption"
 	"github.com/msmkdenis/yap-gophkeeper/internal/interceptors/auth"
 	"github.com/msmkdenis/yap-gophkeeper/internal/interceptors/keyextraction"
 	"github.com/msmkdenis/yap-gophkeeper/internal/proto/credit_card"
+	"github.com/msmkdenis/yap-gophkeeper/internal/proto/text_data"
 	"github.com/msmkdenis/yap-gophkeeper/internal/proto/user"
 	"github.com/msmkdenis/yap-gophkeeper/internal/storage/postgresql"
+	textDataGRPCHandlers "github.com/msmkdenis/yap-gophkeeper/internal/text_data/api/v1/grpchandlers"
+	textDataValidation "github.com/msmkdenis/yap-gophkeeper/internal/text_data/api/v1/validation"
+	textDataService "github.com/msmkdenis/yap-gophkeeper/internal/text_data/service"
 	"github.com/msmkdenis/yap-gophkeeper/internal/tlsconfig"
 	userGRPCHandlers "github.com/msmkdenis/yap-gophkeeper/internal/user/api/v1/grpchandlers"
 	userValidation "github.com/msmkdenis/yap-gophkeeper/internal/user/api/v1/validation"
@@ -64,10 +68,11 @@ func Run() {
 	jwtManager := jwtmanager.New(cfg.TokenName, cfg.TokenSecret, cfg.TokenExpHours)
 
 	userRepo := userRepository.New(postgresPool)
-	creditCardRepo := creditCardRepository.New(postgresPool)
+	dataRepo := repository.New(postgresPool)
 
 	userServ := userService.New(userRepo, cryptService, jwtManager, redis)
-	creditCardServ := creditCardService.New(creditCardRepo, cryptService, jwtManager, redis)
+	creditCardServ := creditCardService.New(dataRepo, cryptService, jwtManager, redis)
+	textDataServ := textDataService.New(dataRepo, cryptService, jwtManager, redis)
 
 	tls, err := tlsconfig.NewTLS(cfg.ServerCert, cfg.ServerKey, cfg.ServerCa)
 	if err != nil {
@@ -81,6 +86,11 @@ func Run() {
 		slog.Error("Failed to initialize credit card validator", slog.String("error", err.Error()))
 		os.Exit(1)
 	}
+	textDataValidator, err := textDataValidation.New(validate)
+	if err != nil {
+		slog.Error("Failed to initialize text data validator", slog.String("error", err.Error()))
+		os.Exit(1)
+	}
 
 	jwtAuth := auth.New(jwtManager)
 	userKeyExtractor := keyextraction.New(cryptService, userRepo, redis)
@@ -90,6 +100,7 @@ func Run() {
 
 	user.RegisterUserServiceServer(grpcServer, userGRPCHandlers.New(userServ, userValidation.New(validate)))
 	credit_card.RegisterCreditCardServiceServer(grpcServer, creditCardGRPCHandlers.New(creditCardServ, creditCardValidator))
+	text_data.RegisterTextDataServiceServer(grpcServer, textDataGRPCHandlers.New(textDataServ, textDataValidator))
 
 	reflection.Register(grpcServer)
 

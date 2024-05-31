@@ -42,10 +42,10 @@ func (m *MockCreditCardService) EXPECT() *MockCreditCardServiceMockRecorder {
 }
 
 // LoadAllCreditCard mocks base method.
-func (m *MockCreditCardService) LoadAllCreditCard(arg0 context.Context, arg1 specification.CreditCardSpecification) ([]model.CreditCardPostResponse, error) {
+func (m *MockCreditCardService) LoadAllCreditCard(arg0 context.Context, arg1 specification.CreditCardSpecification) ([]model.CreditCard, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "LoadAllCreditCard", arg0, arg1)
-	ret0, _ := ret[0].([]model.CreditCardPostResponse)
+	ret0, _ := ret[0].([]model.CreditCard)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -57,10 +57,10 @@ func (mr *MockCreditCardServiceMockRecorder) LoadAllCreditCard(arg0, arg1 any) *
 }
 
 // SaveCreditCard mocks base method.
-func (m *MockCreditCardService) SaveCreditCard(arg0 context.Context, arg1 model.CreditCardPostRequest) (model.CreditCardPostResponse, error) {
+func (m *MockCreditCardService) SaveCreditCard(arg0 context.Context, arg1 model.CreditCardPostRequest) (model.CreditCard, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SaveCreditCard", arg0, arg1)
-	ret0, _ := ret[0].(model.CreditCardPostResponse)
+	ret0, _ := ret[0].(model.CreditCard)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

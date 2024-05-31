@@ -8,30 +8,30 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/msmkdenis/yap-gophkeeper/internal/credit_card/specification"
 	"github.com/msmkdenis/yap-gophkeeper/internal/model"
-	pb "github.com/msmkdenis/yap-gophkeeper/internal/proto/credit_card"
+	pb "github.com/msmkdenis/yap-gophkeeper/internal/proto/text_data"
+	"github.com/msmkdenis/yap-gophkeeper/internal/text_data/specification"
 )
 
-type CreditCardService interface {
-	SaveCreditCard(ctx context.Context, req model.CreditCardPostRequest) (model.CreditCard, error)
-	LoadAllCreditCard(ctx context.Context, spec specification.CreditCardSpecification) ([]model.CreditCard, error)
+type TextDataService interface {
+	SaveTextData(ctx context.Context, req model.TextDataPostRequest) (model.TextData, error)
+	LoadAllTextData(ctx context.Context, spec specification.TextDataSpecification) ([]model.TextData, error)
 }
 
 type Validator interface {
-	ValidatePostRequest(req *model.CreditCardPostRequest) (map[string]string, bool)
+	ValidatePostRequest(req *model.TextDataPostRequest) (map[string]string, bool)
 }
 
 type CreditCardHandler struct {
-	creditCardService CreditCardService
-	pb.UnimplementedCreditCardServiceServer
+	textDataService TextDataService
+	pb.UnimplementedTextDataServiceServer
 	validator Validator
 }
 
-func New(creditCardService CreditCardService, validator Validator) *CreditCardHandler {
+func New(textDataService TextDataService, validator Validator) *CreditCardHandler {
 	return &CreditCardHandler{
-		creditCardService: creditCardService,
-		validator:         validator,
+		textDataService: textDataService,
+		validator:       validator,
 	}
 }
 

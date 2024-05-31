@@ -178,7 +178,7 @@ func (c *CreditCardHandlerTestSuite) Test_PostSaveCreditCard() {
 			expectedCode:          codes.Internal,
 			expectedStatusMessage: "internal error",
 			prepare: func() {
-				c.creditCardService.EXPECT().SaveCreditCard(gomock.Any(), gomock.Any()).Times(1).Return(model.CreditCardPostResponse{}, errors.New("some error"))
+				c.creditCardService.EXPECT().SaveCreditCard(gomock.Any(), gomock.Any()).Times(1).Return(model.CreditCard{}, errors.New("some error"))
 			},
 		},
 	}

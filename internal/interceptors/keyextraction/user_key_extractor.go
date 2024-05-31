@@ -16,6 +16,8 @@ import (
 var userKeyExtractorMandatoryMethods = map[string]struct{}{
 	"/proto.CreditCardService/PostSaveCreditCard": {},
 	"/proto.CreditCardService/GetLoadCreditCard":  {},
+	"/proto.TextDataService/PostSaveTextData":     {},
+	"/proto.TextDataService/GetLoadTextData":      {},
 }
 
 type CryptService interface {

@@ -11,7 +11,7 @@ type CreditCardPostRequest struct {
 	MetaData  string
 }
 
-type CreditCardPostResponse struct {
+type CreditCard struct {
 	ID        string
 	OwnerID   string
 	Number    string
@@ -32,7 +32,7 @@ type CreditCardCryptData struct {
 	PinCode   string
 }
 
-type CreditCard struct {
+type CreditCardBD struct {
 	ID        string    `db:"id" redis:"id"`
 	OwnerID   string    `db:"owner_id" redis:"owner_id"`
 	CryptData []byte    `db:"data" redis:"number"`

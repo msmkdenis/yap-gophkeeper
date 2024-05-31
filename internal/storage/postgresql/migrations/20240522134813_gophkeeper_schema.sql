@@ -14,10 +14,14 @@ create table if not exists gophkeeper.user
     constraint ux_user__login unique (login)
 );
 
-create table if not exists gophkeeper.credit_card
+create type gophkeeper.data_type as enum
+    ('credit_card', 'text_data', 'credentials', 'binary_file');
+
+create table if not exists gophkeeper.data
 (
     id                      text,
     owner_id                text not null,
+    type                    gophkeeper.data_type not null,
     data                    bytea not null,
     metadata                text,
     created_at              timestamp not null,

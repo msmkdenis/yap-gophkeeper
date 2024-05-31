@@ -11,7 +11,7 @@ import (
 	"github.com/msmkdenis/yap-gophkeeper/internal/model"
 )
 
-func (s *CreditCardService) LoadAllCreditCard(ctx context.Context, spec specification.CreditCardSpecification) ([]model.CreditCardPostResponse, error) {
+func (s *CreditCardService) LoadAllCreditCard(ctx context.Context, spec specification.CreditCardSpecification) ([]model.CreditCard, error) {
 	userID, ok := ctx.Value(auth.UserIDContextKey("userID")).(string)
 	if !ok {
 		return nil, fmt.Errorf("failed to get userID from context")
@@ -22,14 +22,14 @@ func (s *CreditCardService) LoadAllCreditCard(ctx context.Context, spec specific
 		return nil, fmt.Errorf("failed to get userKey from context")
 	}
 
-	encryptedCards, err := s.repository.SelectAll(ctx, userID)
+	encryptedCards, err := s.repository.SelectAll(ctx, userID, s.dataType)
 	if err != nil {
 		return nil, fmt.Errorf("select all cards: %w", err)
 	}
 
-	cards := make([]model.CreditCardPostResponse, 0, len(encryptedCards))
+	cards := make([]model.CreditCard, 0, len(encryptedCards))
 	for _, encryptedCard := range encryptedCards {
-		decryptedData, err := s.crypt.Decrypt(userKey, encryptedCard.CryptData)
+		decryptedData, err := s.crypt.Decrypt(userKey, encryptedCard.Data)
 		if err != nil {
 			return nil, fmt.Errorf("decrypt data: %w", err)
 		}
@@ -40,7 +40,7 @@ func (s *CreditCardService) LoadAllCreditCard(ctx context.Context, spec specific
 			return nil, fmt.Errorf("unmarshal data: %w", err)
 		}
 
-		cards = append(cards, model.CreditCardPostResponse{
+		cards = append(cards, model.CreditCard{
 			ID:        encryptedCard.ID,
 			OwnerID:   encryptedCard.OwnerID,
 			Number:    card.Number,
@@ -55,7 +55,7 @@ func (s *CreditCardService) LoadAllCreditCard(ctx context.Context, spec specific
 	}
 
 	predicates := spec.MakeFilterPredicates()
-	var filteredCards []model.CreditCardPostResponse
+	var filteredCards []model.CreditCard
 	for _, card := range cards {
 		take := true
 		for _, filterCardWithSpec := range predicates {
