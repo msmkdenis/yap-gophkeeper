@@ -33,10 +33,10 @@ type CreditCardCryptData struct {
 }
 
 type CreditCardBD struct {
-	ID        string    `db:"id" redis:"id"`
-	OwnerID   string    `db:"owner_id" redis:"owner_id"`
-	CryptData []byte    `db:"data" redis:"number"`
-	CreatedAt time.Time `db:"created_at" redis:"created_at"`
-	UpdatedAt time.Time `db:"updated_at" redis:"updated_at"`
-	MetaData  string    `db:"meta_data" redis:"meta_data"`
+	ID        string    `db:"id"`
+	OwnerID   string    `db:"owner_id"`
+	CryptData []byte    `db:"data"`
+	CreatedAt time.Time `db:"created_at"`
+	UpdatedAt time.Time `db:"updated_at"`
+	MetaData  string    `db:"meta_data"`
 }
