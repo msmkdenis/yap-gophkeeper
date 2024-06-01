@@ -16,8 +16,6 @@ type DataRepository interface {
 }
 
 type CryptService interface {
-	EncryptWithMasterKey(data []byte) ([]byte, error)
-	DecryptWithMasterKey(data []byte) ([]byte, error)
 	Encrypt(key, data []byte) ([]byte, error)
 	Decrypt(key, data []byte) ([]byte, error)
 	GenerateKey() ([]byte, error)

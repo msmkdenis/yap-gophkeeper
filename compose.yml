@@ -26,7 +26,7 @@ services:
       - postgres_db
 
   redis:
-    image: redis:latest
+    image: redis:7-alpine3.20
     container_name: gophkeeper-redis
     ports:
       - "6379:6379"
@@ -39,7 +39,7 @@ services:
 
   # PostgreSQL
   postgres_db:
-    image: postgres:16
+    image: postgres:16-alpine3.20
     container_name: gophkeeper-postgres
     restart: always
     healthcheck:
