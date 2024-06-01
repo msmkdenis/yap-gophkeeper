@@ -10,11 +10,14 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
+	tlsCreds "google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/reflection"
 
 	"github.com/msmkdenis/yap-gophkeeper/internal/cache"
 	"github.com/msmkdenis/yap-gophkeeper/internal/config"
+	credentialsGRPCHandlers "github.com/msmkdenis/yap-gophkeeper/internal/credentials/api/v1/grpchandlers"
+	credentialsValidation "github.com/msmkdenis/yap-gophkeeper/internal/credentials/api/v1/validation"
+	credentialsService "github.com/msmkdenis/yap-gophkeeper/internal/credentials/service"
 	creditCardGRPCHandlers "github.com/msmkdenis/yap-gophkeeper/internal/credit_card/api/v1/grpchandlers"
 	creditCardValidation "github.com/msmkdenis/yap-gophkeeper/internal/credit_card/api/v1/validation"
 	creditCardService "github.com/msmkdenis/yap-gophkeeper/internal/credit_card/service"
@@ -22,6 +25,7 @@ import (
 	"github.com/msmkdenis/yap-gophkeeper/internal/encryption"
 	"github.com/msmkdenis/yap-gophkeeper/internal/interceptors/auth"
 	"github.com/msmkdenis/yap-gophkeeper/internal/interceptors/keyextraction"
+	"github.com/msmkdenis/yap-gophkeeper/internal/proto/credentials"
 	"github.com/msmkdenis/yap-gophkeeper/internal/proto/credit_card"
 	"github.com/msmkdenis/yap-gophkeeper/internal/proto/text_data"
 	"github.com/msmkdenis/yap-gophkeeper/internal/proto/user"
@@ -71,8 +75,9 @@ func Run() {
 	dataRepo := repository.New(postgresPool)
 
 	userServ := userService.New(userRepo, cryptService, jwtManager, redis)
-	creditCardServ := creditCardService.New(dataRepo, cryptService, jwtManager, redis)
-	textDataServ := textDataService.New(dataRepo, cryptService, jwtManager, redis)
+	creditCardServ := creditCardService.New(dataRepo, cryptService, jwtManager)
+	textDataServ := textDataService.New(dataRepo, cryptService, jwtManager)
+	credentialServ := credentialsService.New(dataRepo, cryptService, jwtManager)
 
 	tls, err := tlsconfig.NewTLS(cfg.ServerCert, cfg.ServerKey, cfg.ServerCa)
 	if err != nil {
@@ -91,16 +96,22 @@ func Run() {
 		slog.Error("Failed to initialize text data validator", slog.String("error", err.Error()))
 		os.Exit(1)
 	}
+	credentialsValidator, err := credentialsValidation.New(validate)
+	if err != nil {
+		slog.Error("Failed to initialize credentials validator", slog.String("error", err.Error()))
+		os.Exit(1)
+	}
 
 	jwtAuth := auth.New(jwtManager)
 	userKeyExtractor := keyextraction.New(cryptService, userRepo, redis)
 
-	grpcServer := grpc.NewServer(grpc.Creds(credentials.NewTLS(tls)),
+	grpcServer := grpc.NewServer(grpc.Creds(tlsCreds.NewTLS(tls)),
 		grpc.ChainUnaryInterceptor(jwtAuth.GRPCJWTAuth, userKeyExtractor.ExtractUserKey))
 
 	user.RegisterUserServiceServer(grpcServer, userGRPCHandlers.New(userServ, userValidation.New(validate)))
 	credit_card.RegisterCreditCardServiceServer(grpcServer, creditCardGRPCHandlers.New(creditCardServ, creditCardValidator))
 	text_data.RegisterTextDataServiceServer(grpcServer, textDataGRPCHandlers.New(textDataServ, textDataValidator))
+	credentials.RegisterCredentialsServiceServer(grpcServer, credentialsGRPCHandlers.New(credentialServ, credentialsValidator))
 
 	reflection.Register(grpcServer)
 

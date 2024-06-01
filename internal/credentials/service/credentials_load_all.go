@@ -11,7 +11,7 @@ import (
 	"github.com/msmkdenis/yap-gophkeeper/internal/model"
 )
 
-func (s *CredentialsService) LoadAllCreditCard(ctx context.Context, spec specification.CredentialsSpecification) ([]model.Credentials, error) {
+func (s *CredentialsService) LoadAllCredentials(ctx context.Context, spec specification.CredentialsSpecification) ([]model.Credentials, error) {
 	userID, ok := ctx.Value(auth.UserIDContextKey("userID")).(string)
 	if !ok {
 		return nil, fmt.Errorf("failed to get userID from context")

@@ -12,7 +12,7 @@ import (
 	"github.com/msmkdenis/yap-gophkeeper/internal/model"
 )
 
-func (s *CredentialsService) SaveCreditCard(ctx context.Context, req model.CredentialsPostRequest) (model.Credentials, error) {
+func (s *CredentialsService) SaveCredentials(ctx context.Context, req model.CredentialsPostRequest) (model.Credentials, error) {
 	userID, ok := ctx.Value(auth.UserIDContextKey("userID")).(string)
 	if !ok {
 		return model.Credentials{}, fmt.Errorf("failed to get userID from context")

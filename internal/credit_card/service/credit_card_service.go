@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 
-	"github.com/msmkdenis/yap-gophkeeper/internal/cache"
 	"github.com/msmkdenis/yap-gophkeeper/internal/model"
 	"github.com/msmkdenis/yap-gophkeeper/pkg/jwtmanager"
 )
@@ -16,8 +15,6 @@ type DataRepository interface {
 }
 
 type CryptService interface {
-	EncryptWithMasterKey(data []byte) ([]byte, error)
-	DecryptWithMasterKey(data []byte) ([]byte, error)
 	Encrypt(key, data []byte) ([]byte, error)
 	Decrypt(key, data []byte) ([]byte, error)
 	GenerateKey() ([]byte, error)
@@ -27,16 +24,14 @@ type CreditCardService struct {
 	repository DataRepository
 	crypt      CryptService
 	jwtManager *jwtmanager.JWTManager
-	redis      *cache.Redis
 	dataType   string
 }
 
-func New(repository DataRepository, crypt CryptService, jwtManager *jwtmanager.JWTManager, redis *cache.Redis) *CreditCardService {
+func New(repository DataRepository, crypt CryptService, jwtManager *jwtmanager.JWTManager) *CreditCardService {
 	return &CreditCardService{
 		repository: repository,
 		crypt:      crypt,
 		jwtManager: jwtManager,
-		redis:      redis,
 		dataType:   creditCard,
 	}
 }
