@@ -1,0 +1,36 @@
+-- +goose Up
+-- +goose StatementBegin
+create schema if not exists gophkeeper;
+
+create table if not exists gophkeeper.user
+(
+    id                      text,
+    login                   text not null,
+    password                bytea not null,
+    crypt_key               bytea not null,
+    created_at              timestamp not null,
+    updated_at              timestamp not null,
+    constraint pk_user primary key (id),
+    constraint ux_user__login unique (login)
+);
+
+create type gophkeeper.data_type as enum
+    ('credit_card', 'text_data', 'credentials', 'binary_file');
+
+create table if not exists gophkeeper.data
+(
+    id                      text,
+    owner_id                text not null,
+    type                    gophkeeper.data_type not null,
+    data                    bytea not null,
+    metadata                text,
+    created_at              timestamp not null,
+    updated_at              timestamp not null,
+    constraint pk_credit_card primary key (id),
+    constraint fk_owner_id foreign key (owner_id) references gophkeeper.user (id)
+);
+-- +goose StatementEnd
+
+-- +goose Down
+-- +goose StatementBegin
+-- +goose StatementEnd
