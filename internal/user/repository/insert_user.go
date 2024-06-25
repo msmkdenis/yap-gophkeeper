@@ -15,7 +15,7 @@ import (
 )
 
 func (r *PostgresUserRepository) Insert(ctx context.Context, user model.User) (model.User, error) {
-	rows, err := r.postgresPool.DB.Query(ctx,
+	rows, err := r.postgresPool.WriteDB.Query(ctx,
 		`
 			insert into gophkeeper.user
 				(id, login, password, crypt_key, created_at, updated_at)

@@ -10,7 +10,7 @@ import (
 )
 
 func (r *PostgresDataRepository) SelectAll(ctx context.Context, userID, dataType string) ([]model.Data, error) {
-	rows, err := r.postgresPool.DB.Query(ctx,
+	rows, err := r.postgresPool.ReadDB.Query(ctx,
 		`
 			select
 			    id, owner_id, type, data, metadata, created_at, updated_at 

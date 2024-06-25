@@ -14,7 +14,7 @@ import (
 )
 
 func (r *PostgresDataRepository) Insert(ctx context.Context, data model.Data) (model.Data, error) {
-	rows, err := r.postgresPool.DB.Query(ctx,
+	rows, err := r.postgresPool.WriteDB.Query(ctx,
 		`
 			insert into gophkeeper.data
 			    (id, owner_id, type, data, metadata, created_at, updated_at) 

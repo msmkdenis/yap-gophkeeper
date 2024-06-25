@@ -7,7 +7,7 @@ import (
 
 func (r *PostgresUserRepository) SelectKeyByID(ctx context.Context, userID string) ([]byte, error) {
 	var userKey []byte
-	err := r.postgresPool.DB.QueryRow(ctx,
+	err := r.postgresPool.WriteDB.QueryRow(ctx,
 		`
 			select 
 				crypt_key

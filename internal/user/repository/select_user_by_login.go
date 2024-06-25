@@ -10,7 +10,7 @@ import (
 )
 
 func (r *PostgresUserRepository) SelectByLogin(ctx context.Context, login string) (model.User, error) {
-	rows, err := r.postgresPool.DB.Query(ctx,
+	rows, err := r.postgresPool.ReadDB.Query(ctx,
 		`
 			select 
 				id, login, password, crypt_key, created_at, updated_at
