@@ -7,7 +7,7 @@ services:
     container_name: gophkeeper-app
     restart: always
     environment:
-      - MASTER_DATABASE_URI=postgres://postgres:postgres@gophkeeper-postgres:5432/yap-gophkeeper?sslmode=disable
+      - DATABASE_URI=postgres://postgres:postgres@gophkeeper-postgres:5432/yap-gophkeeper?sslmode=disable
       - GRPC_SERVER=:3300
       - REDIS_URL=redis:6379
       - REDIS_PASSWORD=
@@ -23,16 +23,11 @@ services:
       - "3300:3300"
     depends_on:
       - redis
-      - pg-1
+      - postgres_db
 
   redis:
     image: redis:7-alpine3.20
     container_name: gophkeeper-redis
-    healthcheck:
-      test: [ "CMD", "redis-cli", "-a", "$REDIS_PASSWORD", "ping" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
     ports:
       - "6379:6379"
     environment:
@@ -42,69 +37,26 @@ services:
     volumes:
       - redis_data:/data
 
-  pg-1:
-    container_name: gophkeeper-master-db
-    image: docker.io/bitnami/postgresql-repmgr:16.3.0
+  # PostgreSQL
+  postgres_db:
+    image: postgres:16-alpine3.20
+    container_name: gophkeeper-postgres
+    restart: always
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U postgres -d postgres" ]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 10s
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=yap-gophkeeper
     ports:
       - "5436:5432"
     volumes:
-      - gophkeeper_master_db:/bitnami/postgresql
-      #- ./init.sql:/docker-entrypoint-initdb.d/init.sql
-    environment:
-      - POSTGRESQL_USERNAME=postgres
-      - POSTGRESQL_PASSWORD=postgres
-      - POSTGRESQL_DATABASE=gophkeeper
-      - REPMGR_PASSWORD=repmgrpassword
-      - REPMGR_PRIMARY_HOST=pg-1
-      - REPMGR_PRIMARY_PORT=5432
-      - REPMGR_PARTNER_NODES=pg-1,pg-2:5432
-      - REPMGR_NODE_NAME=pg-1
-      - REPMGR_NODE_NETWORK_NAME=pg-1
-      - REPMGR_PORT_NUMBER=5432
-      - REPMGR_CONNECT_TIMEOUT=1
-      - REPMGR_RECONNECT_ATTEMPTS=2
-      - REPMGR_RECONNECT_INTERVAL=1
-      - REPMGR_MASTER_RESPONSE_TIMEOUT=5
-    restart: unless-stopped
-
-  pg-2:
-    container_name: gophkeeper-slave-db
-    image: docker.io/bitnami/postgresql-repmgr:16.3.0
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres -d postgres" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
-    ports:
-      - "5437:5432"
-    volumes:
-      - gophkeeper_slave_db:/bitnami/postgresql
-    environment:
-      - POSTGRESQL_USERNAME=postgres
-      - POSTGRESQL_PASSWORD=postgres
-      - POSTGRESQL_DATABASE=gophkeeper
-      - REPMGR_PASSWORD=repmgrpassword
-      - REPMGR_PRIMARY_HOST=pg-1
-      - REPMGR_PRIMARY_PORT=5432
-      - REPMGR_PARTNER_NODES=pg-1,pg-2:5432
-      - REPMGR_NODE_NAME=pg-2
-      - REPMGR_NODE_NETWORK_NAME=pg-2
-      - REPMGR_PORT_NUMBER=5432
-      - REPMGR_CONNECT_TIMEOUT=1
-      - REPMGR_RECONNECT_ATTEMPTS=2
-      - REPMGR_RECONNECT_INTERVAL=1
-      - REPMGR_MASTER_RESPONSE_TIMEOUT=5
-    restart: unless-stopped
+      - pg_data:/var/lib/postgresql/data
 
 volumes:
-  gophkeeper_master_db:
-  gophkeeper_slave_db:
   pg_data:
   redis_data:

@@ -24,7 +24,7 @@ func NewMigrations(db *PostgresPool) (*Migrations, error) {
 	}
 	goose.SetBaseFS(embedMigrations)
 
-	return &Migrations{db: stdlib.OpenDBFromPool(db.WriteDB)}, nil
+	return &Migrations{db: stdlib.OpenDBFromPool(db.DB)}, nil
 }
 
 func (m *Migrations) Up() error {

@@ -9,19 +9,18 @@ import (
 )
 
 type Config struct {
-	MasterDatabaseURI string
-	SlaveDatabaseURI  string
-	GRPCServer        string
-	TokenName         string
-	TokenSecret       string
-	TokenExpHours     int
-	ServerCert        string
-	ServerKey         string
-	ServerCa          string
-	RedisURL          string
-	RedisPassword     string
-	RedisDB           int
-	RedisTimeoutSec   int
+	DatabaseURI     string
+	GRPCServer      string
+	TokenName       string
+	TokenSecret     string
+	TokenExpHours   int
+	ServerCert      string
+	ServerKey       string
+	ServerCa        string
+	RedisURL        string
+	RedisPassword   string
+	RedisDB         int
+	RedisTimeoutSec int
 }
 
 func New() (*Config, error) {
@@ -31,8 +30,7 @@ func New() (*Config, error) {
 	}
 
 	config := &Config{}
-	config.MasterDatabaseURI = os.Getenv("MASTER_DATABASE_URI")
-	config.SlaveDatabaseURI = os.Getenv("SLAVE_DATABASE_URI")
+	config.DatabaseURI = os.Getenv("DATABASE_URI")
 	config.GRPCServer = os.Getenv("GRPC_SERVER")
 	config.TokenName = os.Getenv("TOKEN_NAME")
 	expHours, err := strconv.Atoi(os.Getenv("TOKEN_EXP_HOURS"))

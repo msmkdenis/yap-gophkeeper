@@ -63,7 +63,7 @@ func Run() {
 		os.Exit(1)
 	}
 
-	postgresPool, err := initPostgresPool(cfg.MasterDatabaseURI, cfg.SlaveDatabaseURI)
+	postgresPool, err := initPostgresPool(cfg.DatabaseURI)
 	if err != nil {
 		slog.Error("Failed to initialize postgres pool", slog.String("error", err.Error()))
 		os.Exit(1)
@@ -127,11 +127,11 @@ func Run() {
 	}
 }
 
-func initPostgresPool(masterDBURI, slaveDBURI string) (*postgresql.PostgresPool, error) {
+func initPostgresPool(databaseURI string) (*postgresql.PostgresPool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*2)
 	defer cancel()
 
-	postgresPool, err := postgresql.NewPool(ctx, masterDBURI, slaveDBURI)
+	postgresPool, err := postgresql.NewPool(ctx, databaseURI)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to postgres: %w", err)
 	}
