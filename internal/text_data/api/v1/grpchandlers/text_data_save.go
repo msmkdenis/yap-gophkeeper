@@ -12,7 +12,7 @@ import (
 	pb "github.com/msmkdenis/yap-gophkeeper/internal/proto/text_data"
 )
 
-func (h *CreditCardHandler) PostSaveTextData(ctx context.Context, in *pb.PostTextDataRequest) (*pb.PostTextDataResponse, error) {
+func (h *TextDataHandler) PostSaveTextData(ctx context.Context, in *pb.PostTextDataRequest) (*pb.PostTextDataResponse, error) {
 	req := model.TextDataPostRequest{
 		Text:     in.Text,
 		MetaData: in.Metadata,

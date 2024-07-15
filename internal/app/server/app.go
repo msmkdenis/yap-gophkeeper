@@ -13,6 +13,9 @@ import (
 	tlsCreds "google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/reflection"
 
+	binaryDataGRPCHandlers "github.com/msmkdenis/yap-gophkeeper/internal/binary_data/api/v1/grpchandlers"
+	binaryDataValidation "github.com/msmkdenis/yap-gophkeeper/internal/binary_data/api/v1/validation"
+	binaryDataService "github.com/msmkdenis/yap-gophkeeper/internal/binary_data/service"
 	"github.com/msmkdenis/yap-gophkeeper/internal/cache"
 	"github.com/msmkdenis/yap-gophkeeper/internal/config"
 	credentialsGRPCHandlers "github.com/msmkdenis/yap-gophkeeper/internal/credentials/api/v1/grpchandlers"
@@ -25,6 +28,7 @@ import (
 	"github.com/msmkdenis/yap-gophkeeper/internal/encryption"
 	"github.com/msmkdenis/yap-gophkeeper/internal/interceptors/auth"
 	"github.com/msmkdenis/yap-gophkeeper/internal/interceptors/keyextraction"
+	"github.com/msmkdenis/yap-gophkeeper/internal/proto/binary_data"
 	"github.com/msmkdenis/yap-gophkeeper/internal/proto/credentials"
 	"github.com/msmkdenis/yap-gophkeeper/internal/proto/credit_card"
 	"github.com/msmkdenis/yap-gophkeeper/internal/proto/text_data"
@@ -78,6 +82,7 @@ func Run() {
 	creditCardServ := creditCardService.New(dataRepo, cryptService, jwtManager)
 	textDataServ := textDataService.New(dataRepo, cryptService, jwtManager)
 	credentialServ := credentialsService.New(dataRepo, cryptService, jwtManager)
+	binaryDataServ := binaryDataService.New(dataRepo, cryptService, jwtManager)
 
 	tls, err := tlsconfig.NewTLS(cfg.ServerCert, cfg.ServerKey, cfg.ServerCa)
 	if err != nil {
@@ -101,6 +106,11 @@ func Run() {
 		slog.Error("Failed to initialize credentials validator", slog.String("error", err.Error()))
 		os.Exit(1)
 	}
+	binaryDataValidator, err := binaryDataValidation.New(validate)
+	if err != nil {
+		slog.Error("Failed to initialize binary data validator", slog.String("error", err.Error()))
+		os.Exit(1)
+	}
 
 	jwtAuth := auth.New(jwtManager)
 	userKeyExtractor := keyextraction.New(cryptService, userRepo, redis)
@@ -112,6 +122,7 @@ func Run() {
 	credit_card.RegisterCreditCardServiceServer(grpcServer, creditCardGRPCHandlers.New(creditCardServ, creditCardValidator))
 	text_data.RegisterTextDataServiceServer(grpcServer, textDataGRPCHandlers.New(textDataServ, textDataValidator))
 	credentials.RegisterCredentialsServiceServer(grpcServer, credentialsGRPCHandlers.New(credentialServ, credentialsValidator))
+	binary_data.RegisterBinaryDataServiceServer(grpcServer, binaryDataGRPCHandlers.New(binaryDataServ, binaryDataValidator))
 
 	reflection.Register(grpcServer)
 

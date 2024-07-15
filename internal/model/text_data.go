@@ -20,7 +20,7 @@ type TextCryptData struct {
 	Text string
 }
 
-type TextDataBD struct {
+type TextDataDB struct {
 	ID        string    `db:"id"`
 	CryptData []byte    `db:"data"`
 	CreatedAt time.Time `db:"created_at"`

@@ -32,7 +32,7 @@ type CreditCardCryptData struct {
 	PinCode   string
 }
 
-type CreditCardBD struct {
+type CreditCardDB struct {
 	ID        string    `db:"id"`
 	OwnerID   string    `db:"owner_id"`
 	CryptData []byte    `db:"data"`

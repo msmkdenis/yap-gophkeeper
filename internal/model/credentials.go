@@ -23,7 +23,7 @@ type CredentialsCryptData struct {
 	Password string
 }
 
-type CredentialsBD struct {
+type CredentialsDB struct {
 	ID        string    `db:"id"`
 	OwnerID   string    `db:"owner_id"`
 	CryptData []byte    `db:"data"`

@@ -12,7 +12,7 @@ import (
 	"github.com/msmkdenis/yap-gophkeeper/internal/text_data/specification"
 )
 
-func (h *CreditCardHandler) GetLoadTextData(ctx context.Context, in *pb.GetTextDataRequest) (*pb.GetTextDataResponse, error) {
+func (h *TextDataHandler) GetLoadTextData(ctx context.Context, in *pb.GetTextDataRequest) (*pb.GetTextDataResponse, error) {
 	spec, err := specification.NewTextDataSpecification(in)
 	if err != nil {
 		slog.Error("Error while creating text data specification: ", slog.String("error", err.Error()))

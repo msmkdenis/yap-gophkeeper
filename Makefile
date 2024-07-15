@@ -13,6 +13,11 @@ proto-text-data:
        		--go-grpc_out=. --go-grpc_opt=paths=source_relative \
        		internal/proto/text_data/text_data.proto
 
+proto-binary-data:
+	@protoc --go_out=. --go_opt=paths=source_relative \
+       		--go-grpc_out=. --go-grpc_opt=paths=source_relative \
+       		internal/proto/binary_data/binary_data.proto
+
 proto-credentials:
 	@protoc --go_out=. --go_opt=paths=source_relative \
        		--go-grpc_out=. --go-grpc_opt=paths=source_relative \

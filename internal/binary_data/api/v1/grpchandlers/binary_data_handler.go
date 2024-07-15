@@ -8,30 +8,30 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/msmkdenis/yap-gophkeeper/internal/binary_data/specification"
 	"github.com/msmkdenis/yap-gophkeeper/internal/model"
-	pb "github.com/msmkdenis/yap-gophkeeper/internal/proto/text_data"
-	"github.com/msmkdenis/yap-gophkeeper/internal/text_data/specification"
+	pb "github.com/msmkdenis/yap-gophkeeper/internal/proto/binary_data"
 )
 
-type TextDataService interface {
-	SaveTextData(ctx context.Context, req model.TextDataPostRequest) (model.TextData, error)
-	LoadAllTextData(ctx context.Context, spec specification.TextDataSpecification) ([]model.TextData, error)
+type BinaryDataService interface {
+	SaveBinaryData(ctx context.Context, req model.BinaryDataPostRequest) (model.BinaryData, error)
+	LoadAllBinaryData(ctx context.Context, spec specification.BinaryDataSpecification) ([]model.BinaryData, error)
 }
 
 type Validator interface {
-	ValidatePostRequest(req *model.TextDataPostRequest) (map[string]string, bool)
+	ValidatePostRequest(req *model.BinaryDataPostRequest) (map[string]string, bool)
 }
 
-type TextDataHandler struct {
-	textDataService TextDataService
-	pb.UnimplementedTextDataServiceServer
+type BinaryDataHandler struct {
+	binaryDataService BinaryDataService
+	pb.UnimplementedBinaryDataServiceServer
 	validator Validator
 }
 
-func New(textDataService TextDataService, validator Validator) *TextDataHandler {
-	return &TextDataHandler{
-		textDataService: textDataService,
-		validator:       validator,
+func New(binaryDataService BinaryDataService, validator Validator) *BinaryDataHandler {
+	return &BinaryDataHandler{
+		binaryDataService: binaryDataService,
+		validator:         validator,
 	}
 }
 
