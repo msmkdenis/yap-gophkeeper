@@ -25,6 +25,7 @@ services:
       - redis
       - postgres_db
 
+  # In-memory cache
   redis:
     image: redis:7-alpine3.20
     container_name: gophkeeper-redis
@@ -37,7 +38,7 @@ services:
     volumes:
       - redis_data:/data
 
-  # PostgreSQL
+  # PostgreSQL database
   postgres_db:
     image: postgres:16-alpine3.20
     container_name: gophkeeper-postgres

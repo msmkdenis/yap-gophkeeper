@@ -15,7 +15,7 @@ create table if not exists gophkeeper.user
 );
 
 create type gophkeeper.data_type as enum
-    ('credit_card', 'text_data', 'credentials', 'binary_file');
+    ('credit_card', 'text_data', 'credentials', 'binary_data');
 
 create table if not exists gophkeeper.data
 (
