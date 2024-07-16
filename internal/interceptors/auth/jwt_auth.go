@@ -13,12 +13,14 @@ import (
 )
 
 var authMandatoryMethods = map[string]struct{}{
-	"/proto.CreditCardService/PostSaveCreditCard": {},
-	"/proto.CreditCardService/GetLoadCreditCard":  {},
-	"/proto.TextDataService/PostSaveTextData":     {},
-	"/proto.TextDataService/GetLoadTextData":      {},
-	"/proto.BinaryDataService/PostSaveBinaryData": {},
-	"/proto.BinaryDataService/GetLoadBinaryData":  {},
+	"/proto.CreditCardService/PostSaveCreditCard":   {},
+	"/proto.CreditCardService/GetLoadCreditCard":    {},
+	"/proto.TextDataService/PostSaveTextData":       {},
+	"/proto.TextDataService/GetLoadTextData":        {},
+	"/proto.BinaryDataService/PostSaveBinaryData":   {},
+	"/proto.BinaryDataService/GetLoadBinaryData":    {},
+	"/proto.CredentialsService/PostSaveCredentials": {},
+	"/proto.CredentialsService/GetLoadCredentials":  {},
 }
 
 type UserIDContextKey string
