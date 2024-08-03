@@ -31,10 +31,10 @@ client-keys:
 
 mock-credit-card-service:
 	@mockgen --build_flags=--mod=mod \
-			 -destination=internal/mocks/credit_card/mock_credit_card_service.go \
-			 -package=mocks github.com/msmkdenis/yap-gophkeeper/internal/credit_card/api/v1/grpchandlers CreditCardService
+			 -destination=internal/server/mocks/credit_card/mock_credit_card_service.go \
+			 -package=mocks github.com/msmkdenis/yap-gophkeeper/internal/server/credit_card/api/v1/grpchandlers CreditCardService
 
 mock-text-service:
 	@mockgen --build_flags=--mod=mod \
-			 -destination=internal/mocks/text_data/mock_text_data_service.go \
-			 -package=mocks github.com/msmkdenis/yap-gophkeeper/internal/text_data/api/v1/grpchandlers TextDataService
+			 -destination=internal/server/mocks/text_data/mock_text_data_service.go \
+			 -package=mocks github.com/msmkdenis/yap-gophkeeper/internal/server/text_data/api/v1/grpchandlers TextDataService

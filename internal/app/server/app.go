@@ -13,35 +13,35 @@ import (
 	tlsCreds "google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/reflection"
 
-	binaryDataGRPCHandlers "github.com/msmkdenis/yap-gophkeeper/internal/binary_data/api/v1/grpchandlers"
-	binaryDataValidation "github.com/msmkdenis/yap-gophkeeper/internal/binary_data/api/v1/validation"
-	binaryDataService "github.com/msmkdenis/yap-gophkeeper/internal/binary_data/service"
-	"github.com/msmkdenis/yap-gophkeeper/internal/cache"
-	"github.com/msmkdenis/yap-gophkeeper/internal/config"
-	credentialsGRPCHandlers "github.com/msmkdenis/yap-gophkeeper/internal/credentials/api/v1/grpchandlers"
-	credentialsValidation "github.com/msmkdenis/yap-gophkeeper/internal/credentials/api/v1/validation"
-	credentialsService "github.com/msmkdenis/yap-gophkeeper/internal/credentials/service"
-	creditCardGRPCHandlers "github.com/msmkdenis/yap-gophkeeper/internal/credit_card/api/v1/grpchandlers"
-	creditCardValidation "github.com/msmkdenis/yap-gophkeeper/internal/credit_card/api/v1/validation"
-	creditCardService "github.com/msmkdenis/yap-gophkeeper/internal/credit_card/service"
-	repository "github.com/msmkdenis/yap-gophkeeper/internal/data_repository"
-	"github.com/msmkdenis/yap-gophkeeper/internal/encryption"
-	"github.com/msmkdenis/yap-gophkeeper/internal/interceptors/auth"
-	"github.com/msmkdenis/yap-gophkeeper/internal/interceptors/keyextraction"
 	"github.com/msmkdenis/yap-gophkeeper/internal/proto/binary_data"
 	"github.com/msmkdenis/yap-gophkeeper/internal/proto/credentials"
 	"github.com/msmkdenis/yap-gophkeeper/internal/proto/credit_card"
 	"github.com/msmkdenis/yap-gophkeeper/internal/proto/text_data"
 	"github.com/msmkdenis/yap-gophkeeper/internal/proto/user"
-	"github.com/msmkdenis/yap-gophkeeper/internal/storage/postgresql"
-	textDataGRPCHandlers "github.com/msmkdenis/yap-gophkeeper/internal/text_data/api/v1/grpchandlers"
-	textDataValidation "github.com/msmkdenis/yap-gophkeeper/internal/text_data/api/v1/validation"
-	textDataService "github.com/msmkdenis/yap-gophkeeper/internal/text_data/service"
+	binaryDataGRPCHandlers "github.com/msmkdenis/yap-gophkeeper/internal/server/binary_data/api/v1/grpchandlers"
+	binaryDataValidation "github.com/msmkdenis/yap-gophkeeper/internal/server/binary_data/api/v1/validation"
+	binaryDataService "github.com/msmkdenis/yap-gophkeeper/internal/server/binary_data/service"
+	"github.com/msmkdenis/yap-gophkeeper/internal/server/cache"
+	"github.com/msmkdenis/yap-gophkeeper/internal/server/config"
+	credentialsGRPCHandlers "github.com/msmkdenis/yap-gophkeeper/internal/server/credentials/api/v1/grpchandlers"
+	credentialsValidation "github.com/msmkdenis/yap-gophkeeper/internal/server/credentials/api/v1/validation"
+	credentialsService "github.com/msmkdenis/yap-gophkeeper/internal/server/credentials/service"
+	creditCardGRPCHandlers "github.com/msmkdenis/yap-gophkeeper/internal/server/credit_card/api/v1/grpchandlers"
+	creditCardValidation "github.com/msmkdenis/yap-gophkeeper/internal/server/credit_card/api/v1/validation"
+	creditCardService "github.com/msmkdenis/yap-gophkeeper/internal/server/credit_card/service"
+	repository "github.com/msmkdenis/yap-gophkeeper/internal/server/data_repository"
+	"github.com/msmkdenis/yap-gophkeeper/internal/server/encryption"
+	"github.com/msmkdenis/yap-gophkeeper/internal/server/interceptors/auth"
+	"github.com/msmkdenis/yap-gophkeeper/internal/server/interceptors/keyextraction"
+	"github.com/msmkdenis/yap-gophkeeper/internal/server/storage/postgresql"
+	textDataGRPCHandlers "github.com/msmkdenis/yap-gophkeeper/internal/server/text_data/api/v1/grpchandlers"
+	textDataValidation "github.com/msmkdenis/yap-gophkeeper/internal/server/text_data/api/v1/validation"
+	textDataService "github.com/msmkdenis/yap-gophkeeper/internal/server/text_data/service"
+	userGRPCHandlers "github.com/msmkdenis/yap-gophkeeper/internal/server/user/api/v1/grpchandlers"
+	userValidation "github.com/msmkdenis/yap-gophkeeper/internal/server/user/api/v1/validation"
+	userRepository "github.com/msmkdenis/yap-gophkeeper/internal/server/user/repository"
+	userService "github.com/msmkdenis/yap-gophkeeper/internal/server/user/service"
 	"github.com/msmkdenis/yap-gophkeeper/internal/tlsconfig"
-	userGRPCHandlers "github.com/msmkdenis/yap-gophkeeper/internal/user/api/v1/grpchandlers"
-	userValidation "github.com/msmkdenis/yap-gophkeeper/internal/user/api/v1/validation"
-	userRepository "github.com/msmkdenis/yap-gophkeeper/internal/user/repository"
-	userService "github.com/msmkdenis/yap-gophkeeper/internal/user/service"
 	"github.com/msmkdenis/yap-gophkeeper/pkg/jwtmanager"
 )
 
@@ -84,7 +84,7 @@ func Run() {
 	credentialServ := credentialsService.New(dataRepo, cryptService, jwtManager)
 	binaryDataServ := binaryDataService.New(dataRepo, cryptService, jwtManager)
 
-	tls, err := tlsconfig.NewTLS(cfg.ServerCert, cfg.ServerKey, cfg.ServerCa)
+	tls, err := tlsconfig.NewServerTLS(cfg.ServerCert, cfg.ServerKey, cfg.ServerCa)
 	if err != nil {
 		slog.Error("Failed to initialize tls", slog.String("error", err.Error()))
 		os.Exit(1)
