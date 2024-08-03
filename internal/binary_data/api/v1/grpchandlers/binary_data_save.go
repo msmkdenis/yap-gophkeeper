@@ -8,6 +8,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/msmkdenis/yap-gophkeeper/internal/lib"
 	"github.com/msmkdenis/yap-gophkeeper/internal/model"
 	pb "github.com/msmkdenis/yap-gophkeeper/internal/proto/binary_data"
 )
@@ -24,7 +25,7 @@ func (h *BinaryDataHandler) PostSaveBinaryData(ctx context.Context, in *pb.PostB
 	if !ok {
 		slog.Info("Unable to register user: invalid user request",
 			slog.Any("violated_fields", report))
-		return nil, processValidationError("invalid text_data post request", report)
+		return nil, lib.ProcessValidationError("invalid text_data post request", report)
 	}
 
 	binary, err := h.binaryDataService.SaveBinaryData(ctx, req)

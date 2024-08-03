@@ -8,6 +8,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/msmkdenis/yap-gophkeeper/internal/lib"
 	"github.com/msmkdenis/yap-gophkeeper/internal/model"
 	pb "github.com/msmkdenis/yap-gophkeeper/internal/proto/credentials"
 )
@@ -23,7 +24,7 @@ func (h *CredentialsHandler) PostSaveCredentials(ctx context.Context, in *pb.Pos
 	if !ok {
 		slog.Info("Unable to register user: invalid credentials request",
 			slog.Any("violated_fields", report))
-		return nil, processValidationError("invalid credentials post request", report)
+		return nil, lib.ProcessValidationError("invalid credentials post request", report)
 	}
 
 	cred, err := h.credentialsService.SaveCredentials(ctx, req)
