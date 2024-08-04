@@ -6,14 +6,17 @@ import (
 	"log/slog"
 	"os"
 
-	pbclient "github.com/msmkdenis/yap-gophkeeper/internal/client/user/pbclient"
-	"github.com/msmkdenis/yap-gophkeeper/internal/client/user/service"
-	"github.com/msmkdenis/yap-gophkeeper/internal/proto/user"
-
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 
 	"github.com/msmkdenis/yap-gophkeeper/internal/client/config"
+	creaditcardb "github.com/msmkdenis/yap-gophkeeper/internal/client/credit_card/pbclient"
+	creditcardservice "github.com/msmkdenis/yap-gophkeeper/internal/client/credit_card/service"
+	"github.com/msmkdenis/yap-gophkeeper/internal/client/state"
+	userpb "github.com/msmkdenis/yap-gophkeeper/internal/client/user/pbclient"
+	userservice "github.com/msmkdenis/yap-gophkeeper/internal/client/user/service"
+	"github.com/msmkdenis/yap-gophkeeper/internal/proto/credit_card"
+	"github.com/msmkdenis/yap-gophkeeper/internal/proto/user"
 	"github.com/msmkdenis/yap-gophkeeper/internal/tlsconfig"
 )
 
@@ -39,8 +42,13 @@ func Run() {
 		os.Exit(1)
 	}
 
-	userClient := pbclient.NewUserPBClient(user.NewUserServiceClient(grpcClient))
-	userService := service.NewUserService(userClient)
+	clientState := state.NewClientState()
+
+	userClient := userpb.NewUserPBClient(user.NewUserServiceClient(grpcClient))
+	userService := userservice.NewUserService(userClient, clientState)
+
+	creditCardClient := creaditcardb.NewCreditCardPBClient(credit_card.NewCreditCardServiceClient(grpcClient))
+	creditCardService := creditcardservice.NewUserService(creditCardClient, clientState)
 
 	scanner := bufio.NewScanner(os.Stdin)
 
@@ -54,10 +62,17 @@ func Run() {
 			fmt.Println("Программа завершает работу.")
 			return
 		case "register":
-			fmt.Print("Введите данные для обработки: login, password: ")
+			fmt.Print("Введите данные для регистрации 'login password':")
 			scanner.Scan()
 			data := scanner.Text()
-			fmt.Println(userService.RegisterUser(data))
+			userService.RegisterUser(data)
+		case "login":
+			fmt.Print("Введите данные для авторизации 'login password':")
+			scanner.Scan()
+			data := scanner.Text()
+			userService.LoginUser(data)
+		case "save credit card":
+			creditCardService.Save()
 		default:
 			fmt.Println("Неизвестная команда.")
 		}

@@ -2,7 +2,10 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"fmt"
+
+	"github.com/msmkdenis/yap-gophkeeper/internal/server/user/cerrors"
 
 	"github.com/jackc/pgx/v5"
 
@@ -24,6 +27,10 @@ func (r *PostgresUserRepository) SelectByLogin(ctx context.Context, login string
 
 	savedUser, err := pgx.CollectOneRow(rows, pgx.RowToStructByPos[model.User])
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return model.User{}, cerrors.ErrUserNotFound
+		}
+
 		return model.User{}, fmt.Errorf("insert user: %w", err)
 	}
 

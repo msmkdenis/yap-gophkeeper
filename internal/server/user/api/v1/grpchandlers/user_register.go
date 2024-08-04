@@ -5,6 +5,8 @@ import (
 	"errors"
 	"log/slog"
 
+	"github.com/msmkdenis/yap-gophkeeper/internal/server/lib"
+
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -24,7 +26,7 @@ func (h *UserHandler) PostRegisterUser(ctx context.Context, in *pb.PostUserRegis
 		slog.Info("Unable to register user: invalid user request",
 			slog.String("user_login", req.Login),
 			slog.Any("violated_fields", report))
-		return nil, processValidationError("invalid user request", report)
+		return nil, lib.ProcessValidationError("invalid user request", report)
 	}
 
 	token, err := h.userService.Register(ctx, req)

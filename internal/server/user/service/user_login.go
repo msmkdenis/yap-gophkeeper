@@ -8,6 +8,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/msmkdenis/yap-gophkeeper/internal/server/model"
+	"github.com/msmkdenis/yap-gophkeeper/internal/server/user/cerrors"
 )
 
 func (u *UserService) Login(ctx context.Context, req model.UserLoginRequest) (string, error) {
@@ -18,7 +19,7 @@ func (u *UserService) Login(ctx context.Context, req model.UserLoginRequest) (st
 
 	err = bcrypt.CompareHashAndPassword(user.Password, []byte(req.Password))
 	if err != nil {
-		return "", fmt.Errorf("login password compare hash: %w", err)
+		return "", cerrors.ErrInvalidPassword
 	}
 
 	token, err := u.jwtManager.BuildJWTString(user.ID)
