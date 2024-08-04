@@ -7,10 +7,11 @@ import (
 	"os"
 
 	"github.com/fatih/color"
-
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 
+	binarypb "github.com/msmkdenis/yap-gophkeeper/internal/client/binary_data/pbclient"
+	binaryservice "github.com/msmkdenis/yap-gophkeeper/internal/client/binary_data/service"
 	"github.com/msmkdenis/yap-gophkeeper/internal/client/config"
 	credentialspb "github.com/msmkdenis/yap-gophkeeper/internal/client/credentials/pbclient"
 	credentialsservice "github.com/msmkdenis/yap-gophkeeper/internal/client/credentials/service"
@@ -21,6 +22,7 @@ import (
 	textdataservice "github.com/msmkdenis/yap-gophkeeper/internal/client/text_data/service"
 	userpb "github.com/msmkdenis/yap-gophkeeper/internal/client/user/pbclient"
 	userservice "github.com/msmkdenis/yap-gophkeeper/internal/client/user/service"
+	"github.com/msmkdenis/yap-gophkeeper/internal/proto/binary_data"
 	credGrpc "github.com/msmkdenis/yap-gophkeeper/internal/proto/credentials"
 	"github.com/msmkdenis/yap-gophkeeper/internal/proto/credit_card"
 	"github.com/msmkdenis/yap-gophkeeper/internal/proto/text_data"
@@ -64,6 +66,9 @@ func Run() { //nolint:cyclop
 	credentialsClient := credentialspb.NewCredentialsPBClient(credGrpc.NewCredentialsServiceClient(grpcClient))
 	credentialsService := credentialsservice.NewCredentialsService(credentialsClient, clientState)
 
+	binaryClient := binarypb.NewBinaryDataPBClient(binary_data.NewBinaryDataServiceClient(grpcClient))
+	binaryService := binaryservice.NewBinaryDataService(binaryClient, clientState)
+
 	scanner := bufio.NewScanner(os.Stdin)
 
 	blue := color.New(color.FgBlue).SprintFunc()
@@ -91,7 +96,9 @@ func Run() { //nolint:cyclop
 		fmt.Println("[6] - load text data")
 		fmt.Println("[7] - save credentials")
 		fmt.Println("[8] - load credentials")
-		fmt.Println("[9] - set working directory")
+		fmt.Println("[9] - save binary file")
+		fmt.Println("[10] - load binary files")
+		fmt.Println("[11] - set working directory")
 		scanner.Scan()
 		input := scanner.Text()
 
@@ -116,6 +123,10 @@ func Run() { //nolint:cyclop
 		case "8":
 			credentialsService.Load()
 		case "9":
+			binaryService.Save()
+		case "10":
+			binaryService.Load()
+		case "11":
 			clientState.SetWorkingDirectory()
 		default:
 			fmt.Println("Unknown command, please try again")
