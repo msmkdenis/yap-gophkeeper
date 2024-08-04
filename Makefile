@@ -38,3 +38,9 @@ mock-text-service:
 	@mockgen --build_flags=--mod=mod \
 			 -destination=internal/server/mocks/text_data/mock_text_data_service.go \
 			 -package=mocks github.com/msmkdenis/yap-gophkeeper/internal/server/text_data/api/v1/grpchandlers TextDataService
+
+build:
+	@go build -o gophkeeper cmd/gophkeeper_client/main.go
+
+run:
+	./gophkeeper
