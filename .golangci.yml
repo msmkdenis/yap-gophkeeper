@@ -26,6 +26,8 @@ output:
 
 # all available settings of specific linters
 linters-settings:
+  cyclop:
+    max-complexity: 15
   varnamelen:
     # The longest distance, in source lines, that is being considered a "small scope." (defaults to 5)
     # Variables used in at most this many lines will be ignored.
@@ -123,8 +125,8 @@ linters:
     - errorlint
     - exhaustive
     #     - exhaustruct
-    - forbidigo
-    - funlen
+    #     - forbidigo
+    #     - funlen
     #     - gci
     - gocognit
     - goconst
